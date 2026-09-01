@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trendy Max</title>
+<meta name="google-site-verification" content="googleb30833c1b4e03e7ff.html" />
+<style>
+body{background:#000;color:#fff;font-family:Arial;padding:15px;text-align:center}
+.song{background:#111;padding:15px;margin:15px 0;border-radius:12px}
+.btn{background:#ffeb3b;color:#000;padding:15px;display:block;text-decoration:none;font-weight:900;font-size:20px;border-radius:10px;margin-top:10px;border:3px solid red}
+#adminPanel{display:none;background:#222;padding:15px;border-radius:10px;margin-top:20px;text-align:left}
+input{width:90%;padding:12px;margin:5px 0;border-radius:8px;border:none}
+button{padding:10px 20px;background:#00ff88;border:none;border-radius:8px;font-weight:bold}
+#adminBtn{margin-top:40px;background:#333;color:#777;border:none;padding:8px}
+</style>
+</head>
+<body>
+<h1 style="color:#ffeb3b">TRENDY MAX</h1>
+<div id="list"></div>
+
+<!-- ADMIN PART - HIDDEN WITH PASSWORD -->
+<button id="adminBtn" onclick="login()">Admin Login</button>
+<div id="adminPanel">
+<h3>Upload New Song (Only You)</h3>
+<input id="t" placeholder="Title">
+<input id="a" placeholder="Artist">
+<input id="f" type="file" accept="audio/*">
+<button onclick="save()">Upload</button>
+<button onclick="logout()" style="background:red;color:#fff">Lock</button>
+</div>
+
+<script>
+let PASS="trendy123"; // <- YOUR PASSWORD CHANGE IT HERE
+let DB="trendy_songs_v2";
+let songs=JSON.parse(localStorage.getItem(DB)||'[]');
+function login(){
+ let p=prompt("Enter Admin Password:");
+ if(p===PASS){document.getElementById('adminPanel').style.display='block';document.getElementById('adminBtn').style.display='none';}
+ else{alert("Wrong!");}
+}
+function logout(){document.getElementById('adminPanel').style.display='none';document.getElementById('adminBtn').style.display='inline';}
+function save(){
+ let file=document.getElementById('f').files[0];
+ if(!file)return alert("Pick file");
+ let r=new FileReader();
+ r.onload=e=>{
+  songs.unshift({title:document.getElementById('t').value,artist:document.getElementById('a').value,url:e.target.result});
+  localStorage.setItem(DB,JSON.stringify(songs));
+  show();
+  alert("Saved!");
+ };
+ r.readAsDataURL(file);
+}
+function show(){
+ let h="";
+ songs.forEach(s=>{
+  h+=`<div class="song"><b>${s.title}</b> - ${s.artist}<br><audio controls src="${s.url}" style="width:100%"></audio><a class="btn" href="${s.url}" download="${s.title}.mp3">⬇ DOWNLOAD MP3</a></div>`;
+ });
+ if(h=="")h="<p>No songs yet. Click Admin Login to add.</p>";
+ document.getElementById('list').innerHTML=h;
+}
+show();
+</script>
+</body>
+</html>
