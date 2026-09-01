@@ -2,65 +2,73 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trendy Max</title>
-<meta name="google-site-verification" content="googleb30833c1b4e03e7ff.html" />
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOORO TRENDY</title>
 <style>
-body{background:#000;color:#fff;font-family:Arial;padding:15px;text-align:center}
-.song{background:#111;padding:15px;margin:15px 0;border-radius:12px}
-.btn{background:#ffeb3b;color:#000;padding:15px;display:block;text-decoration:none;font-weight:900;font-size:20px;border-radius:10px;margin-top:10px;border:3px solid red}
-#adminPanel{display:none;background:#222;padding:15px;border-radius:10px;margin-top:20px;text-align:left}
-input{width:90%;padding:12px;margin:5px 0;border-radius:8px;border:none}
-button{padding:10px 20px;background:#00ff88;border:none;border-radius:8px;font-weight:bold}
-#adminBtn{margin-top:40px;background:#333;color:#777;border:none;padding:8px}
+body{margin:0;background:#000;color:#fff;font-family:Arial;text-align:center;padding:15px}
+h1{color:#ffeb3b;font-size:32px}
+.song{background:#121212;border:1px solid #333;padding:15px;border-radius:15px;margin:15px 0}
+.download{background:#ffeb3b;color:#000;display:block;padding:16px;font-weight:900;text-decoration:none;border-radius:12px;margin-top:10px;font-size:19px;border:3px solid red}
+audio{width:100%;margin-top:10px}
+#adminArea{display:none;background:#1a1a1a;padding:15px;border-radius:15px;margin-top:25px;text-align:left;border:2px solid #ffeb3b}
+input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:none}
+.btn{padding:12px 20px;border:none;border-radius:8px;font-weight:bold}
 </style>
 </head>
 <body>
-<h1 style="color:#ffeb3b">TRENDY MAX</h1>
-<div id="list"></div>
+<h1>TOORO TRENDY</h1>
+<p>The Home of Tooro Music</p>
+<div id="songs"></div>
 
-<!-- ADMIN PART - HIDDEN WITH PASSWORD -->
-<button id="adminBtn" onclick="login()">Admin Login</button>
-<div id="adminPanel">
-<h3>Upload New Song (Only You)</h3>
-<input id="t" placeholder="Title">
-<input id="a" placeholder="Artist">
-<input id="f" type="file" accept="audio/*">
-<button onclick="save()">Upload</button>
-<button onclick="logout()" style="background:red;color:#fff">Lock</button>
+<!-- THIS IS THE SINGLE PASSWORD GATE -->
+<button onclick="unlock()" style="margin-top:50px;background:#222;color:#666;border:none;padding:10px;border-radius:8px">Admin</button>
+
+<div id="adminArea">
+<h3>TOORO Admin - Upload</h3>
+<input id="title" placeholder="Song Title">
+<input id="artist" placeholder="Artist Name">
+<input id="file" type="file" accept="audio/*">
+<br><br>
+<button class="btn" style="background:#00ff88" onclick="upload()">Upload Song</button>
+<button class="btn" style="background:red;color:#fff" onclick="lock()">Lock 🔒</button>
+<p style="color:#888;font-size:12px">Only you see this after password. Fans never see it.</p>
 </div>
 
 <script>
-let PASS="trendy123"; // <- YOUR PASSWORD CHANGE IT HERE
-let DB="trendy_songs_v2";
-let songs=JSON.parse(localStorage.getItem(DB)||'[]');
-function login(){
- let p=prompt("Enter Admin Password:");
- if(p===PASS){document.getElementById('adminPanel').style.display='block';document.getElementById('adminBtn').style.display='none';}
- else{alert("Wrong!");}
+const PASSWORD = "tooro2024"; // CHANGE YOUR PASSWORD HERE
+let songs = JSON.parse(localStorage.getItem("tooro_db")||"[]");
+
+function unlock(){
+ let p = prompt("Enter TOORO Admin Password:");
+ if(p === PASSWORD){
+   document.getElementById("adminArea").style.display="block";
+ } else if(p!== null){
+   alert("Wrong password!");
+ }
 }
-function logout(){document.getElementById('adminPanel').style.display='none';document.getElementById('adminBtn').style.display='inline';}
-function save(){
- let file=document.getElementById('f').files[0];
- if(!file)return alert("Pick file");
- let r=new FileReader();
- r.onload=e=>{
-  songs.unshift({title:document.getElementById('t').value,artist:document.getElementById('a').value,url:e.target.result});
-  localStorage.setItem(DB,JSON.stringify(songs));
-  show();
-  alert("Saved!");
+function lock(){ document.getElementById("adminArea").style.display="none"; }
+
+function upload(){
+ let f = document.getElementById("file").files[0];
+ if(!f) return alert("Select audio file");
+ let r = new FileReader();
+ r.onload = e => {
+   songs.unshift({t:document.getElementById("title").value||"Untitled", a:document.getElementById("artist").value||"Tooro Artist", url:e.target.result});
+   localStorage.setItem("tooro_db", JSON.stringify(songs));
+   render(); alert("Song Added!");
  };
- r.readAsDataURL(file);
+ r.readAsDataURL(f);
 }
-function show(){
- let h="";
+
+function render(){
+ let html="";
  songs.forEach(s=>{
-  h+=`<div class="song"><b>${s.title}</b> - ${s.artist}<br><audio controls src="${s.url}" style="width:100%"></audio><a class="btn" href="${s.url}" download="${s.title}.mp3">⬇ DOWNLOAD MP3</a></div>`;
+   html+=`<div class="song"><b>${s.t}</b> - ${s.a}<audio controls src="${s.url}"></audio><a class="download" href="${s.url}" download="${s.t}.mp3">⬇ DOWNLOAD MP3</a></div>`;
  });
- if(h=="")h="<p>No songs yet. Click Admin Login to add.</p>";
- document.getElementById('list').innerHTML=h;
+ if(!html) html="<p>No songs yet. Click Admin to add first song.</p>";
+ document.getElementById("songs").innerHTML=html;
 }
-show();
+render();
 </script>
 </body>
 </html>
